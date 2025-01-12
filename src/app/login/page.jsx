@@ -2,13 +2,14 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import Image from 'next/image';
+import { loginUser } from '../../../lib/api.js';
 import { useRouter } from 'next/navigation'; // next/router'dan import edilen hata veriyor.
 
 export default function LoginPage() {
 
-  const [email, setemail] = useState();
+  const [email, setemail] = useState('');
   const [loggedin, setloggedin] = useState(false);
-  const [password, setpassword] = useState();
+  const [password, setpassword] = useState('');
   const [isAdmin, setisAdmin] = useState();
   const [showPassword, setShowPassword] = useState(false); // Şifreyi gösterme kontrolü
 
@@ -35,7 +36,8 @@ export default function LoginPage() {
         router.push('/loggedin'); // Giriş başarılı, yönlendirme yapılıyor.
       }
     } catch (error) {
-      alert('Login failed: ' + error.response?.data?.message || 'Invalid credentials');
+      console.error('Login API error:', error.response || error);
+      alert('Login failed: ' + error.response?.data?.message || error.message ||'Invalid credentials');
     }
   };
 
