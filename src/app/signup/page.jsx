@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link'; // Link importu eklendi
+import { signinUser } from '../../../lib/api.js'; // signinUser fonksiyonunu import ettik
+import Link from 'next/link';
+import { useRouter } from 'next/navigation'; 
 
 export default function SignUpPage() {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -10,7 +12,10 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const [name, setName] = useState(''); // Yeni state ekledik
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState(''); // Email state'i ekledik
+
+  const router = useRouter(); 
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
@@ -20,15 +25,28 @@ export default function SignUpPage() {
     setConfirmPasswordVisible(!confirmPasswordVisible);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
       setError('Passwords do not match');
     } else {
       setError('');
-      // Proceed with signup logic
-      console.log('User signed up');
+      // Kullanıcı giriş işlemi için signinUser fonksiyonunu çağırıyoruz
+      try {
+        const userSigninDTO = { name, email, password }; // name doğru şekilde kullanıldı
+        const response = await signinUser(userSigninDTO); // Backend'e giriş için veri gönderiliyor
+        console.log(response);
+        if (response != null)  {
+          console.log('User signed in');
+          router.push('/login');
+          // Başarılı girişten sonra yapılacak işlemler (örneğin, yönlendirme)
+        } else {
+          setError('Invalid email or password');
+        }
+      } catch (error) {
+        setError('Something went wrong, please try again');
+      }
     }
   };
 
@@ -43,20 +61,22 @@ export default function SignUpPage() {
 
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <input
-              className="p-2 mt-2 rounded-xl border text-black" // mt-4 yerine mt-2
+              className="p-2 mt-2 rounded-xl border text-black"
               type="text"
               name="name"
-              placeholder="Full Name" // Yeni input
+              placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
 
             <input
-              className="p-2 mt-2 rounded-xl border text-black" // mt-4 yerine mt-2
+              className="p-2 mt-2 rounded-xl border text-black"
               type="email"
               name="email"
               placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
 
@@ -151,12 +171,6 @@ export default function SignUpPage() {
           />
         </div>
       </div>
-
-      <footer className='bg-gray-100 text-center p-4 mt-auto'>
-        <p className='text-sm text-gray-500'>
-          © 2025 All Rights Reserved.
-        </p>
-      </footer>
     </section>
   );
 }

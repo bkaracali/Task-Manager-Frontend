@@ -131,13 +131,6 @@ export default function LoginPage() {
           />
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className='bg-gray-100 text-center p-4 mt-auto'>
-        <p className='text-sm text-gray-500'>
-          © 2025 All Rights Reserved.
-        </p>
-      </footer>
     </section>
   );
 }
